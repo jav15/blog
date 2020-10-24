@@ -25,11 +25,19 @@ class CommentsController < ApplicationController
   # POST /comments.json
   def create
     @comment = Comment.new(comment_params)
-
+if params[:post_id]
+  #De esta manera crear correctamente comentarios estando dentro del post
+  @post = Post.find(params[:post_id])
+  @comment = @post.comments.create(comment_params)
+else
+  #De esta manera puedes seguir creando comentarios en localhost:3000/comments/new estando fuera de un post
+  @comment = Comment.new(comment_params)
+end
     respond_to do |format|
       if @comment.save
         format.html { redirect_to @comment, notice: 'Comment was successfully created.' }
         format.json { render :show, status: :created, location: @comment }
+        format.js #create.js.erb
       else
         format.html { render :new }
         format.json { render json: @comment.errors, status: :unprocessable_entity }
